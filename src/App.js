@@ -24,8 +24,8 @@ const App = () => {
   const fetchRandomVocabularies = async () => {
     try {
       const response = await axios.post(
-        "http://192.168.1.5:3003/api/vocabulary/get-random",
-        { count: 10 }
+        "https://english-elevate-server.vercel.app/api/vocabulary/get-random",
+        { count: 20 }
       );
       const vocabData = response.data.data || [];
       setVocabularies(vocabData);
