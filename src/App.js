@@ -13,7 +13,7 @@ const App = () => {
           element={
             <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
               <h1 className="text-3xl font-bold mb-8">Select Mode</h1>
-              <div className="flex gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <Link to="/input-mode">
                   <Card
                     hoverable

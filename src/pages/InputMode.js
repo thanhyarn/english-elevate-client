@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { message, Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const InputMode = () => {
   const [vocabularies, setVocabularies] = useState([]);
@@ -15,6 +16,7 @@ const InputMode = () => {
   const inputRefs = useRef([]);
   const [submitDisabled, setSubmitDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Fetch random vocabulary on page load
   useEffect(() => {
@@ -61,21 +63,21 @@ const InputMode = () => {
     }
   };
 
-  const handleKeyDown = (e, index) => {
-    if (e.key === "Backspace") {
-      // Allow backspace for current input
-      if (inputValues[index]) {
-        const updatedInputs = [...inputValues];
-        updatedInputs[index] = ""; // Clear current input value
-        setInputValues(updatedInputs);
-      } else if (index > 0 && hints[index] === "_") {
-        // Move to the previous input if the current one is empty
-        inputRefs.current[index - 1]?.focus();
-      }
-    } else if (e.key === "Enter" && !submitDisabled) {
-      handleSubmit();
-    }
-  };
+  // const handleKeyDown = (e, index) => {
+  //   if (e.key === "Backspace") {
+  //     // Allow backspace for current input
+  //     if (inputValues[index]) {
+  //       const updatedInputs = [...inputValues];
+  //       updatedInputs[index] = ""; // Clear current input value
+  //       setInputValues(updatedInputs);
+  //     } else if (index > 0 && hints[index] === "_") {
+  //       // Move to the previous input if the current one is empty
+  //       inputRefs.current[index - 1]?.focus();
+  //     }
+  //   } else if (e.key === "Enter" && !submitDisabled) {
+  //     handleSubmit();
+  //   }
+  // };
 
   const handleSubmit = () => {
     const currentWord = vocabularies[currentIndex].englishWord.toLowerCase();
@@ -142,7 +144,7 @@ const InputMode = () => {
 
   const renderInputs = () => {
     return hints.map((hint, index) => (
-      <div key={index} className="relative w-8 h-14">
+      <div key={index} className="relative w-6 h-10 sm:w-8 sm:h-14">
         <input
           type="text"
           maxLength={1}
@@ -151,7 +153,11 @@ const InputMode = () => {
           onKeyDown={(e) => handleKeyDown(e, index)}
           ref={(el) => (inputRefs.current[index] = el)}
           disabled={hint !== "_"}
-          className={`absolute w-full h-full text-center text-2xl font-bold border-b-2 ${
+          autoCapitalize="none" // Tắt in hoa mặc định
+          style={{
+            textTransform: "none", // Tắt chữ in hoa mặc định
+          }}
+          className={`absolute w-full h-full text-center text-lg sm:text-2xl font-bold border-b-2 ${
             hint !== "_"
               ? "border-gray-400 text-gray-700 bg-gray-100 pointer-events-none"
               : "border-blue-500 focus:outline-none"
@@ -159,6 +165,21 @@ const InputMode = () => {
         />
       </div>
     ));
+  };
+
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Backspace") {
+      // Xử lý Backspace trên mobile
+      if (inputValues[index]) {
+        const updatedInputs = [...inputValues];
+        updatedInputs[index] = ""; // Clear current input value
+        setInputValues(updatedInputs);
+      } else if (index > 0 && hints[index] === "_") {
+        setTimeout(() => inputRefs.current[index - 1]?.focus(), 0); // Focus lại ô trước
+      }
+    } else if (e.key === "Enter" && !submitDisabled) {
+      handleSubmit();
+    }
   };
 
   if (isLoading) {
@@ -176,6 +197,12 @@ const InputMode = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
+      <button
+        onClick={() => navigate("/")}
+        className="absolute top-4 left-4 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+      >
+        Back
+      </button>
       <div className="w-full max-w-xl bg-white rounded-lg shadow-lg p-6">
         <h1 className="text-2xl font-bold text-center mb-4">English Quiz</h1>
         <p className="text-lg text-center mb-2">
@@ -187,7 +214,9 @@ const InputMode = () => {
         <p className="text-center text-sm text-gray-500 mb-6">
           Part of speech: {currentPartOfSpeech || "unknown"}
         </p>
-        <div className="flex justify-center gap-1 mb-6">{renderInputs()}</div>
+        <div className="flex justify-center gap-1 mb-6 flex-wrap">
+          {renderInputs()}
+        </div>
         {exampleVisible && (
           <div className="text-center text-gray-600 mb-4">
             <p>
