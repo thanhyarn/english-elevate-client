@@ -40,7 +40,7 @@ const MultipleChoiceMode = () => {
     try {
       const response = await axios.post(
         "https://english-elevate-server.vercel.app/api/vocabulary/get-random",
-        { count: 20 }
+        { count: 50 }
       );
       setVocabularies(response.data.data || []);
       setLoading(false);
